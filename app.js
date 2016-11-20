@@ -10,6 +10,10 @@ var users = require('./routes/users');
 var category = require('./routes/category');
 var photo = require('./routes/photo');
 
+var adminUsers = require('./routes/admin/users');
+var adminCategory = require('./routes/admin/category');
+var adminPost = require('./routes/admin/post');
+
 var app = express();
 
 // view engine setup
@@ -28,12 +32,57 @@ app.use(express.static(path.join(__dirname, 'public')));
 var result = require('./routes/return-result.js');
 app.use(result.resultMiddle);
 
+var expressSsession = require('express-session');
+app.use(expressSsession({
+  secret : 'haying2009',
+  resave : false,
+  saveUninitialized : false,
+  cookie : {maxAge : 60 * 60 *1000}
+}));
+
+//获取访问IP
+app.use(function (req, res, next) {
+  var ip = req.headers['x-forwarded-for'] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      req.connection.socket.remoteAddress; //设置ip
+  req.ip = ip;//将解析后的ip放入req中,一遍方便使用
+
+  next();
+});
+
+//身份验证
+app.use(function (req, res, next) {
+  // req.session.userId;
+  // req.session.userNick;
+  // req.session.right;
+  if (req.session.userId){
+    req.isLogin = true;
+    next();
+  }
+  else {
+    req.isLogin = false;
+    console.log(req.url);
+    var reg = new RegExp('^/admin/');
+    if (reg.test(req.url)) {
+      if (req.url === '/admin/users/login' || req.url ==='/admin/users/signup') next();
+      else return res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
+    }
+    else next();
+  }
+
+});
+
+
+
+
 app.use('/', index);
-app.use('/users', users);
-app.use('/categorys', category);
-app.use('/photos', photo);
-
-
+// app.use('/users', users);
+// app.use('/categorys', category);
+// app.use('/photos', photo);
+app.use('/admin/users', adminUsers);
+app.use('/admin/categorys', adminCategory);
+app.use('/admin/posts', adminPost);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -41,17 +90,6 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
-
-// error handler
-// app.use(function(err, req, res, next) {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get('env') === 'development' ? err : {};
-//
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render('error');
-// });
 
 app.use(logErrors);
 app.use(clientErrorHandler);

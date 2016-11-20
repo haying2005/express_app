@@ -19,6 +19,20 @@ var resultMiddle = function (req, res, next) {
     };
     next();
 };
+// var adminResultMiddle = function (req, res, next) {
+//     res.errorJson = function (code, msg, admin) {
+//         var result_ = new Result(code, msg, undefined);
+//         result_.admin = admin;
+//         res.json(result_);
+//     };
+//
+//     res.rightJson = function (data) {
+//         var result_ = new Result(0, 'ok', data);
+//         result_.admin = admin;
+//         res.json(result_);
+//     };
+//     next();
+// };
 
 var RestResult = function(){
     this.errorCode = RestResult.NO_ERROR ;
@@ -37,6 +51,7 @@ var RestResult = function(){
 
 module.exports = {
     resultMiddle : resultMiddle,
+    //adminResultMiddle : adminResultMiddle,
     NO_ERROR : 0,
     ILLEGAL_ARGUMENT_ERROR_CODE : 1,
     BUSINESS_ERROR_CODE : 2,
