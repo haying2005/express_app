@@ -14,6 +14,7 @@ var expressSsession = require('express-session');
 
 router.post('/', createPost);
 router.get('/', getPostList);
+router.get('/:id', getPostById);
 module.exports = router;
 
 
@@ -77,4 +78,16 @@ function getPostList(req, res) {
             if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
             res.rightJson(items);
         })
+}
+
+/**
+ * 根据id查询post
+ */
+function getPostById(req, res) {
+    var id = req.params.id;
+    Post.model.model.findOne({_id : id}, function (err, item) {
+        if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+        if (!item) return res.errorJson(result.TARGET_NOT_EXIT_ERROR_CODE, '该id不存在');
+        res.rightJson(item);
+    })
 }
