@@ -81,8 +81,8 @@ function signup(req, res) {
             if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
             if (user) return res.errorJson(result.BUSINESS_ERROR_CODE, '昵称被使用');
 
-            var user = new User.model.model({LoginName : loginName, Password : pass, Nick : nick});
-            user.save(function (err) {
+            var user_ = new User.model.model({LoginName : loginName, Password : pass, Nick : nick});
+            user_.save(function (err) {
                 if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
                 res.rightJson();
             });

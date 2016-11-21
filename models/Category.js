@@ -7,6 +7,9 @@ var categorySchemea = new mongoose.Schema({
     fatherId : mongoose.Schema.Types.ObjectId,
     childs : Array,
     itemCount : {type : Number, default : 0}
+},{
+    versionKey: false,
+    timestamps: true
 });
 
 var categoryModel = new Model('Category', categorySchemea);

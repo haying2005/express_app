@@ -9,25 +9,14 @@ var Post = require('../../models/Post');
 var Category = require('../../models/Category');
 var result = require('../return-result');
 
-var cookieParser = require('cookie-parser');
-var expressSsession = require('express-session');
+// var cookieParser = require('cookie-parser');
+// var expressSsession = require('express-session');
 
 router.post('/', createPost);
 router.get('/', getPostList);
 router.get('/:id', getPostById);
+router.use('/', modifyById, deleteById);
 module.exports = router;
-
-
-// category : mongoose.Schema.Types.ObjectId,    //分类id
-//     title : {type : String, default : ''},
-// by : mongoose.Schema.Types.ObjectId,
-//     brief : {type : String, default : ''},
-// thumbnail : mongoose.Schema.Types.ObjectId,    //缩略图ID 缩略图只能从图库取,所以设置为ID类型
-//     content : {type : String, default : ''},    //正文内容
-// publish : {type : Boolean, default : 0},   //是否发布
-// recommend : {type : Boolean, default : 0},   //是否推荐
-// updateTime : {type : Date, default : new Date()},   //最后更新时间
-// click : {type : Number, default : 0}
 
 
 /*
@@ -50,6 +39,7 @@ function createPost(req, res) {
             by : req.session.userId,
             brief : body.brief,
             thumbnail : body.thumbnail,
+            author : body.author,
             content : body.content,
             publish : body.publish,
             recommend : body.recommend
@@ -76,12 +66,13 @@ function getPostList(req, res) {
         .limit(size)
         .exec(function (err, items) {
             if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+
             res.rightJson(items);
         })
 }
 
 /**
- * 根据id查询post
+ * 根据id查询文章
  */
 function getPostById(req, res) {
     var id = req.params.id;
@@ -90,4 +81,51 @@ function getPostById(req, res) {
         if (!item) return res.errorJson(result.TARGET_NOT_EXIT_ERROR_CODE, '该id不存在');
         res.rightJson(item);
     })
+}
+
+/**
+ * 修改文章 创建者 点击次数  不能手动更新
+ * todo:title brief等 需要做为空判断,不允许其为空 不能用!来判断,因为有可能没有传值
+ */
+function modifyById(req, res, next) {
+    if (req.method.toLowerCase() === 'put'){
+
+        var body = req.body;
+
+        if (!body._id) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, '_id不能为空');
+        var update = {};
+        if (body.category !== undefined) update.category = body.category;
+        if (body.title !== undefined) update.title = body.title;
+        if (body.author !== undefined) update.author = body.author;
+        if (body.brief !== undefined) update.brief = body.brief;
+        if (body.thumbnail !== undefined) update.thumbnail = body.thumbnail;
+        if (body.content !== undefined) update.content = body.content;
+        if (body.publish !== undefined) update.publish = body.publish;
+        if (body.recommend !== undefined) update.recommend = body.recommend;
+        if (body.category !== undefined) update.category = body.category;
+
+
+        Post.model.model.findByIdAndUpdate({_id : body._id}, update, function (err, item) {
+            if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+            res.rightJson();
+        })
+    }
+
+    else next();
+
+}
+
+function deleteById(req, res, next) {
+    if (req.method.toLowerCase() === 'delete') {
+        var body = req.body;
+
+        if (!body._id) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, '_id不允许为空');
+        Post.model.model.findByIdAndRemove(body._id, function (err, item) {
+            if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+            if (!item) return res.errorJson(result.TARGET_NOT_EXIT_ERROR_CODE, '该id不存在');
+            res.rightJson();
+        })
+    }
+    else  next();
+
 }

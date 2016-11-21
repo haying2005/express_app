@@ -19,6 +19,9 @@ var userScheme = new mongoose.Schema({
     Ip : {type : String, default : '0.0.0.0'},
     Mobile : String,
     Email : String
+},{
+    versionKey: false,
+    timestamps: true
 });
 
 

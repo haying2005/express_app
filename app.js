@@ -13,6 +13,7 @@ var photo = require('./routes/photo');
 var adminUsers = require('./routes/admin/users');
 var adminCategory = require('./routes/admin/category');
 var adminPost = require('./routes/admin/post');
+var adminPhoto = require('./routes/admin/photos');
 
 var app = express();
 
@@ -79,10 +80,11 @@ app.use(function (req, res, next) {
 app.use('/', index);
 // app.use('/users', users);
 // app.use('/categorys', category);
-// app.use('/photos', photo);
+//  app.use('/photos', photo);
 app.use('/admin/users', adminUsers);
 app.use('/admin/categorys', adminCategory);
 app.use('/admin/posts', adminPost);
+app.use('/admin/photos', adminPhoto);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
