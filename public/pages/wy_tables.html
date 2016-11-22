@@ -481,54 +481,13 @@
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
 
-    <!-- 引入Vue.js 开发版-->
-    <script src="../javascripts/Vue.js"></script>
-
     <!-- Page-Level Demo Scripts - Tables - Use for reference -->
     <script>
     $(document).ready(function() {
 
-        /**
-         * Vue代码
-         * */
-        var vm = new Vue({
-            el : '#dataTables-example',
-            data : {
-                isInit : false,
-                header :
-                        [   //构建要显示的field
-                            {field : 'Nick', display : '昵称'},
-                            //{field : 'HeadUrl', display : '头像'},
-                            {field : 'LastLoginTime', display : '最后登录时间'},
-                            {field : 'Rights', display : '权限'},
-                            //{field : 'Ip', display : '最后登录ip'},
-                            {field : 'Mobile', display : '手机'},
-                            {field : 'Email', display : 'Email'}
-                ],
-                items : []
-            },
-            created: function () {
-                this.init();
-            },
-            methods: {
-                init: function () {
-                    var that = this;
-                    $.ajax({url:"/users",success:function(result){
-                        that.items = result.data;
-                        //setTimeout(setDataTable,1);
-                        Vue.nextTick(function () {
-                            $('#dataTables-example').DataTable({
-                                responsive: true
-                            } )
-                        });
-
-                    }});
-                    var a;
-                }
-
-            }
-        });
-        window.vm = vm;
+        $('#dataTables-example').DataTable({
+            responsive: true
+        } )
     });
     </script>
 
