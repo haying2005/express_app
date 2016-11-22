@@ -115,6 +115,9 @@ function modifyById(req, res, next) {
 
 }
 
+/**
+ * 删除指定id的post
+ */
 function deleteById(req, res, next) {
     if (req.method.toLowerCase() === 'delete') {
         var body = req.body;

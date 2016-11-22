@@ -53,28 +53,7 @@ app.use(function (req, res, next) {
 });
 
 //身份验证
-app.use(function (req, res, next) {
-  // req.session.userId;
-  // req.session.userNick;
-  // req.session.right;
-  if (req.session.userId){
-    req.isLogin = true;
-    next();
-  }
-  else {
-    req.isLogin = false;
-    console.log(req.url);
-    var reg = new RegExp('^/admin/');
-    if (reg.test(req.url)) {
-      if (req.url === '/admin/users/login' || req.url ==='/admin/users/signup') next();
-      else return res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
-    }
-    else next();
-  }
-
-});
-
-
+//app.use(loginValidate);
 
 
 app.use('/', index);
@@ -115,6 +94,28 @@ function errorHandler (err, req, res, next) {
   res.render('error', { error: err })
 }
 
+
+//身份验证
+function loginValidate (req, res, next) {
+  // req.session.userId;
+  // req.session.userNick;
+  // req.session.right;
+  if (req.session.userId){
+    req.isLogin = true;
+    next();
+  }
+  else {
+    req.isLogin = false;
+    console.log(req.url);
+    var reg = new RegExp('^/admin/');
+    if (reg.test(req.url)) {
+      if (req.url === '/admin/users/login' && req.method.toLowerCase() === "post" || req.url ==='/admin/users/signup' && req.method.toLowerCase() === 'post') next();
+      else return res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
+    }
+    else next();
+  }
+
+}
 
 
 module.exports = app;

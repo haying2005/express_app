@@ -27,11 +27,12 @@ router.post('/upload', upload.single('photo'), function (req, res, next) {
     //要上传的空间
     bucket = 'fang-space';
     //上传到七牛后保存的文件名
-    key = file.filename;
+    //key = file.filename;
 
     //构建上传策略函数，设置回调的url以及需要回调给业务服务器的数据
     function uptoken(bucket, key) {
-        var putPolicy = new qiniu.rs.PutPolicy(bucket+":"+key);
+        //var putPolicy = new qiniu.rs.PutPolicy(bucket+":"+key);
+        var putPolicy = new qiniu.rs.PutPolicy(bucket);
         //putPolicy.callbackUrl = 'http://your.domain.com/callback';
         //putPolicy.callbackBody = 'filename=$(fname)&filesize=$(fsize)';
         return putPolicy.token();
@@ -49,8 +50,6 @@ router.post('/upload', upload.single('photo'), function (req, res, next) {
         qiniu.io.putFile(uptoken, key, localFile, extra, function(err, ret) {
             if(!err) {
                 // 上传成功， 处理返回值
-                //console.log(ret.hash, ret.key, ret.persistentId);
-                //console.log(ret);
                 fullpath = path.join(domain, ret.key);
                 res.rightJson({path : fullpath});
 
@@ -65,6 +64,8 @@ router.post('/upload', upload.single('photo'), function (req, res, next) {
 //调用uploadFile上传
     uploadFile(token, key, filePath);
 });
+
+router.get('/qnToken', qiniuToken);
 
 // router.post('/', createPost);
 // router.get('/', getPostList);
@@ -82,12 +83,28 @@ function createPhoto() {
 
 
 /*
-
+生产七牛upLoadToken
  */
-function uploadFile(req, res) {
+function qiniuToken(req, res) {
 
-    file = req.file;
-    console.log(file);
+    var domain = 'http://ogomt2558.bkt.clouddn.com';
 
+    //要上传的空间
+    bucket = 'fang-space';
+
+    //构建上传策略函数，设置回调的url以及需要回调给业务服务器的数据
+    function uptoken(bucket, key) {
+        //var putPolicy = new qiniu.rs.PutPolicy(bucket+":"+key);
+        var putPolicy = new qiniu.rs.PutPolicy(bucket);
+        //putPolicy.callbackUrl = 'http://your.domain.com/callback';
+        //putPolicy.callbackBody = 'filename=$(fname)&filesize=$(fsize)';
+        return putPolicy.token();
+    }
+
+//生成上传 Token
+    token = uptoken(bucket);
+
+    res.rightJson({token : token});
 
 }
+
