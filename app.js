@@ -109,7 +109,7 @@ function loginValidate (req, res, next) {
     console.log(req.url);
     var reg = new RegExp('^/admin/');
     if (reg.test(req.url)) {
-      if (req.url === '/admin/users/login' && req.method.toLowerCase() === "post" || req.url ==='/admin/users/signup' && req.method.toLowerCase() === 'post') next();
+      if (req.url === '/admin/users/login' || req.url ==='/admin/users/signup') next();
       else return res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
     }
     else next();

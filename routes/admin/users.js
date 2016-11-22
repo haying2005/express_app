@@ -20,6 +20,7 @@ router.use(expressSsession({
 }));
 
 router.post('/login', login);
+router.get('/login', toLoginPage);
 router.post('/signup', signup);
 module.exports = router;
 
@@ -91,3 +92,9 @@ function signup(req, res) {
 }
 
 
+/**
+ * 输出登陆页面
+ */
+function toLoginPage(req, res) {
+    res.render('login');
+}
