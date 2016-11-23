@@ -17,10 +17,8 @@ angular.module('myApp.createPost',['ngRoute'])
         $scope.post.brief = '';
         $scope.post.thumbnail = '';
         $scope.post.content = '';
-        $scope.post.publish = 0;
-        $scope.post.recommend = 0;
-
-        $scope.selectedCategory;
+        $scope.post.publish = false;
+        $scope.post.recommend = false;
 
 
 
@@ -32,12 +30,14 @@ angular.module('myApp.createPost',['ngRoute'])
                     $scope.selectedCategory = $scope.categorys[0];
                     $scope.post.author = response.userInfo.nick;
 
-                    $scope.post.category = $scope.selectedCategory._id;
 
                 }
                 else console.log(response);
             });
         $scope.submit = function () {
+            
+            $scope.post.category = $scope.selectedCategory._id;
+
             if (!$scope.post.title) return alert('请填写标题');
             if (!$scope.post.category) return alert('请选择分类');
             if (!$scope.post.brief) return alert('请填写摘要');
