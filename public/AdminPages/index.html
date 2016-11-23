@@ -75,7 +75,8 @@
     <script>
         angular.module('myApp', [
                 'ngRoute',
-                'myApp.createPost'
+                'myApp.createPost',
+                'myApp.postlist'
 
         ]).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
             //$locationProvider.hashPrefix('!');
@@ -91,6 +92,7 @@
     </script>
 
     <script src="./createpost.js"></script>
+    <script src="./postlist.js"></script>
 
     <!-- jQuery -->
     <script src="../vendor/jquery/jquery.min.js"></script>

@@ -62,14 +62,16 @@ function getPostList(req, res) {
     var size = parseInt(req.query.size) || 3;
     var condition = category ? {category : category} : null;
 
-    Post.model.model.find(condition)
-        .skip(page * size)
-        .limit(size)
-        .exec(function (err, items) {
-            if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+    Post.model.model.count(condition, function (err, count) {
+        if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+        if (count === 0) return res.rightJson({count : 0, items : []});
 
-            res.rightJson(items);
+        Post.model.model.find(condition).skip(page * size).limit(size).exec(function (err, items) {
+            if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+            res.rightJson({count : count, items : items});
         })
+    });
+
 }
 
 /**
