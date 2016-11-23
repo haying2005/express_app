@@ -16,7 +16,8 @@
     "multer": "*",
     "mongoose": "*",
     "express-session" : "1.14.2",
-    "qiniu" : "*"
+    "qiniu" : "*",
+    "angular" : "*"
 
   }
 }
