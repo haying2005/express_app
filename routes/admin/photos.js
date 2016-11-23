@@ -73,7 +73,6 @@ router.get('/qnToken', qiniuToken);
 // router.use('/', modifyById, deleteById);
 module.exports = router;
 
-
 /*
     创建
  */

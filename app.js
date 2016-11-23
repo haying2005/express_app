@@ -53,7 +53,7 @@ app.use(function (req, res, next) {
 });
 
 //身份验证
-//app.use(loginValidate);
+app.use(loginValidate);
 
 
 app.use('/', index);
@@ -101,7 +101,11 @@ function loginValidate (req, res, next) {
   // req.session.userNick;
   // req.session.right;
   if (req.session.userId){
-    req.isLogin = true;
+    //req.isLogin = true;
+    req.userInfo = {
+      uid : req.session.userId,
+      nick : req.session.userNick
+    };
     next();
   }
   else {

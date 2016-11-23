@@ -3,10 +3,9 @@ var baseModel = require('./User.js');
 var Model = baseModel.Model;
 var mongoose = baseModel.mongoose;
 var categorySchemea = new mongoose.Schema({
-    name : String, //根分类写死：文章 图片 产品 询价 公司信息(联系我们，关于我们)
-    fatherId : mongoose.Schema.Types.ObjectId,
-    childs : Array,
-    itemCount : {type : Number, default : 0}
+    name : String,
+    fatherId : mongoose.Schema.Types.ObjectId,  //可以为空 fatherid跟root 至少要有一样
+    root : Number   //属于哪个根分类 1.Post 2.Product 3.Photo 
 },{
     versionKey: false,
     timestamps: true

@@ -1,0 +1,59 @@
+<form role="form" novalidate>
+    <fieldset>
+
+    <div class="form-group">
+        <label>标题</label>
+        <input ng-model="post.title" class="form-control" placeholder="文章标题">
+        <!--<p class="help-block">请输入标题</p>-->
+    </div>
+
+    <div class="form-group">
+        <label>作者</label>
+        <input ng-model="post.author" class="form-control" placeholder="作者">
+        <!--<p class="help-block">请输入标题</p>-->
+    </div>
+
+    <div class="form-group">
+        <label>选择分类</label>
+        <select class="form-control" ng-model="selectedCategory" ng-options="x.name for x in categorys">
+            <!--<option>请选择</option>-->
+            <!--<option>2</option>-->
+            <!--<option>3</option>-->
+            <!--<option>4</option>-->
+            <!--<option>5</option>-->
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>摘要</label>
+        <textarea ng-model="post.brief" class="form-control" rows="3" placeholder="不要超过100字"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>缩略图</label>
+        <input type="file">
+    </div>
+
+    <div class="form-group">
+        <label>正文</label>
+        <textarea ng-model="post.content" class="form-control" rows="6" placeholder="请输入正文..."></textarea>
+    </div>
+
+    <div class="form-group">
+        <label class="checkbox-inline">
+            <input ng-model="post.publish" type="checkbox">发布
+        </label>
+
+        <label class="checkbox-inline">
+            <input ng-model="post.recommend" type="checkbox">置顶
+        </label>
+
+    </div>
+    <button ng-click="submit()" class="btn btn-primary">提交</button>
+    <!--<button type="submit" class="btn btn-default">重置</button>-->
+    </fieldset>
+</form>
+
+<script>
+
+</script>

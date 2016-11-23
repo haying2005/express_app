@@ -16,7 +16,6 @@ var postSchemea = new mongoose.Schema({
     content : {type : String, default : ''},    //正文内容
     publish : {type : Boolean, default : 0},   //是否发布
     recommend : {type : Boolean, default : 0},   //是否推荐
-    //updateTime : {type : Date, default : new Date()},   //最后更新时间
     click : {type : Number, default : 0}
 
 },{

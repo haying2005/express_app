@@ -42,7 +42,8 @@ function createPost(req, res) {
             author : body.author,
             content : body.content,
             publish : body.publish,
-            recommend : body.recommend
+            recommend : body.recommend,
+            category : body.category
         });
         post.save(function (err) {
             if (err) res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
