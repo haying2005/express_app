@@ -17,21 +17,20 @@
             <tr class="odd" ng-repeat="post in posts">
                 <td class="" ng-repeat="(key, value) in fields">{{post[key]}}</td>
                 <td >
-                    <button type="button" class="btn btn-default btn-xs">修改</button>
+                    <button type="button" class="btn btn-default btn-xs"><a href="#!/editpost?id={{post._id}}">修改</a></button>
                     <button type="button" class="btn btn-default btn-xs">删除</button>
                 </td>
             </tr>
-
 
             </tbody>
         </table>
 
         <nav>
             <ul class="pagination">
-                <li class="disabled"><a href="">&laquo;</a></li>
+                <li ng-click="toPage(page - 1)" ng-class="{disabled : page == 0}"><a href="">&laquo;</a></li>
                 <!--<li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>-->
-                <li ng-repeat="x in pages"><a href="">{{$index + 1}}</a></li>
-                <li><a href="">&raquo;</a></li>
+                <li ng-class="{active : page == $index}" ng-repeat="x in pages" ng-click="toPage($index)"><a href="">{{$index + 1}}</a></li>
+                <li ng-click="toPage(page + 1)" ng-class="{disabled : page == pageCount - 1}"><a href="">&raquo;</a></li>
             </ul>
         </nav>
     </div>

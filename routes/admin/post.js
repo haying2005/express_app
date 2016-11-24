@@ -16,6 +16,8 @@ router.post('/', createPost);
 router.get('/', getPostList);
 router.get('/:id', getPostById);
 router.use('/', modifyById, deleteById);
+
+router.get('/count', getPostCount);
 module.exports = router;
 
 
@@ -59,26 +61,36 @@ function createPost(req, res) {
 function getPostList(req, res) {
     var category = req.query.category;
     var page = parseInt(req.query.page) || 0;
-    var size = parseInt(req.query.size) || 3;
+    var size = parseInt(req.query.size) || 30;
     var condition = category ? {category : category} : null;
 
-    Post.model.model.count(condition, function (err, count) {
+    Post.model.model.find(condition).skip(page * size).limit(size).exec(function (err, items) {
         if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
-        if (count === 0) return res.rightJson({count : 0, items : []});
-
-        Post.model.model.find(condition).skip(page * size).limit(size).exec(function (err, items) {
-            if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
-            res.rightJson({count : count, items : items});
-        })
-    });
-
+        res.rightJson(items);
+    })
 }
 
 /**
+ * 获取文章数量
+ */
+function getPostCount(req, res) {
+    var root = parseInt(req.query.root);
+    var category = req.query.category;
+    var condition = {};
+    if (category) condition.category = category;
+
+    Post.model.model.count(condition, function (err, count) {
+        if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+        res.rightJson(count);
+    });
+}
+/**
  * 根据id查询文章
  */
-function getPostById(req, res) {
+function getPostById(req, res, next) {
     var id = req.params.id;
+    if (id == 'count') return next('route');    //获取数目接口
+
     Post.model.model.findOne({_id : id}, function (err, item) {
         if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
         if (!item) return res.errorJson(result.TARGET_NOT_EXIT_ERROR_CODE, '该id不存在');

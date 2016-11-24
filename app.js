@@ -102,10 +102,10 @@ function loginValidate (req, res, next) {
   // req.session.right;
   if (req.session.userId){
     //req.isLogin = true;
-    req.userInfo = {
-      uid : req.session.userId,
-      nick : req.session.userNick
-    };
+    // req.userInfo = {
+    //   uid : req.session.userId,
+    //   nick : req.session.userNick
+    // };
     next();
   }
   else {

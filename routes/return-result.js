@@ -10,13 +10,13 @@ function Result(code, description, data) {
 var resultMiddle = function (req, res, next) {
     res.errorJson = function (code, msg) {
         var result_ = new Result(code, msg, undefined);
-        result_.userInfo = req.userInfo;//用户基本信息附加到返回里
+        //result_.userInfo = req.userInfo;//用户基本信息附加到返回里
         res.json(result_);
     };
 
     res.rightJson = function (data) {
         var result_ = new Result(0, 'ok', data);
-        result_.userInfo = req.userInfo;//用户基本信息附加到返回里
+        //result_.userInfo = req.userInfo;//用户基本信息附加到返回里
         res.json(result_);
     };
     next();

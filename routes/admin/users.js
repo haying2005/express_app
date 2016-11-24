@@ -22,6 +22,7 @@ router.use(expressSsession({
 router.post('/login', login);
 router.get('/login', toLoginPage);
 router.post('/signup', signup);
+router.get('/info', getUserInfo);
 module.exports = router;
 
 /**
@@ -91,6 +92,18 @@ function signup(req, res) {
     });
 }
 
+/**
+ * 获取个人信息
+ */
+function getUserInfo(req, res) {
+    var id = req.session.userId;
+    if (!id) return res.errorJson(result.AUTH_ERROR_CODE, '身份认证失败');
+    User.model.model.findOne({_id : id}, function (err, user) {
+        if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+        if (!user) return res.errorJson(result.BUSINESS_ERROR_CODE, '未找到该用户');
+        res.rightJson(user);
+    });
+}
 
 /**
  * 输出登陆页面

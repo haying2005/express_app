@@ -45,7 +45,7 @@
 
 <body>
 
-    <div ng-app="myApp" id="wrapper">
+    <div ng-app="myApp" ng-controller="rootCtrl" id="wrapper">
 
         <!-- Navigation -->
         <div ng-include="'./navigation.html'"></div>
@@ -79,14 +79,33 @@
                 'myApp.postlist'
 
         ]).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
-            //$locationProvider.hashPrefix('!');
-
+            $locationProvider.hashPrefix('!');
             $routeProvider
 //                    .when('/', {template: '首页'})
 //                    .when('/photo', {template: '图片库'})
 //                    .when('/product', {template: '产品'})
                     .otherwise({redirectTo: '/'});
-        }])
+        }]).controller('rootCtrl', function ($scope, $http) {
+            //获取一些信息 供全局使用
+            //获取用户信息
+            $http.get('/admin/users/info').success(function (response) {
+                if (response.code == 0) {
+                    $scope.rt_userInfo = response.data;
+                    console.log(response);
+                }
+                else {
+                    console.log(response.description);
+                }
+            });
+
+            $http.get('/admin/categorys').success(function (response) {
+                if (response.code == 0) {
+                    $scope.rt_categorys = response.data;
+                }
+                else console.log(response.description);
+            });
+
+        });
 
 
     </script>

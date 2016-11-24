@@ -3,13 +3,14 @@
  */
 
 angular.module('myApp.postlist', ['ngRoute'])
-    .config(['$routeProvider', function ($routeProvider) {
+    .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
         $routeProvider.when('/postlist', {
             templateUrl: './postlist.html',
             controller: 'postlistCtrl'
         });
 }]).
 value('fields', {
+    //数据库原始字段
     categoryName : '分类',    //分类name
     title : '标题',
     //by : '创建者',    //创建者id
@@ -17,64 +18,75 @@ value('fields', {
     //brief : '摘要',
     //thumbnail : '缩略图',    //缩略图url
     //content : '正文内容',    //正文内容
+    click : '点击数',
+
+    //自定义字段
     publishState : '发布',   //是否发布
-    recommendState : '推荐',   //是否推荐
-    click : '点击数'
+    recommendState : '推荐'   //是否推荐
 
 }).
-controller('postlistCtrl', function ($scope, $http, fields){
-    $scope.fields = fields;
-    $scope.page = 0;
-    $scope.size = 1;
-    $scope.posts = [];
-    $scope.categorys = [];
-    $scope.itemCount = 0;   //总条目数
+controller('postlistCtrl', function ($scope, $http, $location, fields){
+    $scope.fields = fields; //要显示的字段
 
-    $scope.pageCount = 0;
+    $scope.page = 0;    //当前页
+    $scope.size = 0;    //每页显示数量
+    $scope.posts = [];  //显示的post数据
+    $scope.categorys = $scope.rt_categorys;  //所有类目,用来做categoryId与categoryName的映射
+    $scope.itemCount = 0;   //总条目数
+    $scope.pageCount = 0;   //总页数
     $scope.pages = [];
 
-    //获取所有文章分类
-    $http.get("/admin/categorys?root=1")
-        .success(function (response) {
+    $scope.toPage = function (page) {
+        if (page == $scope.page) return;
+        if (page < 0) return;
+        if (page > $scope.pageCount - 1) return;
+      setPage(page);
+    };
+
+    //初始化 参数为每页显示条数, 当前页编号
+    intiWithSize(1, 0);
+
+    function setPage(page) {
+        $scope.page = page;
+        $http.get('/admin/posts?page=' + $scope.page + '&&size=' + $scope.size).success(function (response) {
+            console.log(response);
             if (response.code === 0) {
-                console.log(response.data);
-                $scope.categorys = response.data;
-
-                $http.get('/admin/posts?page=' + $scope.page + '&&size=' + $scope.size).success(function (response) {
-                    console.log(response);
-                    if (response.code === 0) {
-                        $scope.itemCount = response.data.count;
-                        $scope.pageCount = Math.ceil($scope.itemCount / $scope.size);
-                        for (var i = 0; i < $scope.pageCount; i ++) {
-                            $scope.pages.push(i);
+                var data = response.data;
+                //预处理
+                data.map(function (x) {
+                    for (var i = 0; i < $scope.categorys.length; i ++) {
+                        if ($scope.categorys[i]._id == x.category) {
+                            x.categoryName = $scope.categorys[i].name;
+                            break;
                         }
-                        var data = response.data.items;
-                        //console.log(data);
-                        //return;
-                        data.map(function (x) {
-                           for (var i = 0; i < $scope.categorys.length; i ++) {
-                               if ($scope.categorys[i]._id == x.category) {
-                                   x.categoryName = $scope.categorys[i].name;
-                                   break;
-                               }
-                           }
-                           x.recommendState = x.recommend ? '是' : '否';
-                            x.publishState = x.publish ? '是' : '否'
-
-                        });
-                        $scope.posts = data;
                     }
-                    else  {
-                        alert(response.description);
-                    }
+                    x.recommendState = x.recommend ? '是' : '否';
+                    x.publishState = x.publish ? '是' : '否'
                 });
-
+                //预处理后的值付给posts
+                $scope.posts = data;
             }
-            else {
-                console.log(response);
+            else  {
                 alert(response.description);
             }
         });
-
+    }
+    function intiWithSize(pageSize, page) {
+        $scope.size = pageSize;
+        //step1 获取所有post下的category
+        //setp2 获取总条数
+        $http.get('/admin/posts/count').success(function (response) {
+            if (response.code == 0) {
+                $scope.itemCount = parseInt(response.data);
+                $scope.pageCount = Math.ceil($scope.itemCount / $scope.size);
+                for (var i = 0; i < $scope.pageCount; i ++) {
+                    $scope.pages.push(i);
+                }
+                //step3 获取实际的数据
+                setPage(page);
+            }
+            else console.log(response.description);
+        });
+    }
 
 });
