@@ -17,7 +17,6 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
     .controller('createPostCtrl', function ($scope, $http, FileUploader) {
 
         //===========================>
-        //var token = '4XJ-j01TBq87-xR6B3r-IvXg0ufjZMtVlK9huB99:UL4TNiwUQJve4KEubqmDd53T7oE=:eyJtaW1lTGltaXQiOiJpbWFnZS8qIiwicmV0dXJuQm9keSI6IntrZXk6JChrZXkpLCBoYXNoOiQoZXRhZyksIHc6JChpbWFnZUluZm8ud2lkdGgpLCBoOiQoaW1hZ2VJbmZvLmhlaWdodCl9Iiwic2NvcGUiOiJmYW5nLXNwYWNlIiwiZGVhZGxpbmUiOjE0ODAxNTc3MDh9';
         //angular-file-upload
 
         $scope.pics = [];
@@ -68,6 +67,15 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
             console.info('onSuccessItem', fileItem, response, status, headers);
             $scope.pics.push({url : $scope.prefix + '/' + response.key});
             uploader.removeFromQueue(fileItem); //从列队里删除,否则再添加文件就会失败 因为限制了queueLimit=1
+            //将文件信息提交到服务器存档
+            var photo = {};
+            photo.name = response.key;
+            photo.hash = response.hash;
+            photo.path = $scope.prefix + '/' + response.key;
+            photo.album = '文章相册';
+            $http.post('/admin/photos', photo).success(function (response) {
+                console.log(response);
+            });
         };
         uploader.onErrorItem = function(fileItem, response, status, headers) {
             console.info('onErrorItem', fileItem, response, status, headers);

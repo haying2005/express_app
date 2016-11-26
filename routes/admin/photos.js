@@ -64,6 +64,7 @@ router.post('/upload', upload.single('photo'), function (req, res, next) {
 //调用uploadFile上传
     uploadFile(token, key, filePath);
 });
+router.post('/', createPhoto);
 
 router.get('/qnToken', qiniuToken);
 
@@ -76,8 +77,30 @@ module.exports = router;
 /*
     创建
  */
-function createPhoto() {
-    
+function createPhoto(req, res) {
+    var body = req.body;
+    if (!body.name) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, '缺少name');
+    if (!body.hash) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, '缺少hash');
+    if (!body.path) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, '缺少path');
+    //if (!req.session.userId) return res.errorJson(result.AUTH_ERROR_CODE, '用户身份验证失败,无法添加photo');
+
+    Photo.model.model.findOne({hash : body.hash}, function (err, item) {
+        if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+        if (item) return res.errorJson(result.ALREADY_EXIT_ERROR_CODE, '文件已存在');   //图片已经存在
+        photo = new Photo.model.model({
+            hash : body.hash,
+            name : body.name,
+            path : body.path,
+            album : body.album,
+            by : req.session.userId,
+            title : body.title
+        });
+        photo.save(function (err) {
+            if (err) res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
+            res.rightJson(photo);
+        });
+
+    });
 }
 
 
@@ -87,6 +110,7 @@ function createPhoto() {
 function qiniuToken(req, res) {
 
     var domain = 'http://ogomt2558.bkt.clouddn.com';
+    console.log(req.host);
 
     //要上传的空间
     bucket = 'fang-space';
@@ -95,7 +119,7 @@ function qiniuToken(req, res) {
     function uptoken(bucket) {
         //var putPolicy = new qiniu.rs.PutPolicy(bucket+":"+key);
         var putPolicy = new qiniu.rs.PutPolicy(bucket);
-        putPolicy.returnBody = '{"key":$(key), "hash":$(etag)}';
+        //putPolicy.returnBody = '{"key":$(key), "hash":$(etag)}';
         putPolicy.mimeLimit = 'image/*';    //限制只能上传图片
         //putPolicy.callbackUrl = 'http://your.domain.com/callback';
         //putPolicy.callbackBody = 'filename=$(fname)&filesize=$(fsize)';

@@ -31,7 +31,7 @@ function createPost(req, res) {
     if (!body.title || body.title.length === 0) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, 'title不能为空');
     if (!body.brief || body.brief.length === 0) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, 'brief不能为空');
     if (!body.content || body.content.length === 0) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, 'content不能为空');
-    if (!req.session.userId) return res.errorJson(result.AUTH_ERROR_CODE, '用户身份验证失败');
+    if (!req.session.userId) return res.errorJson(result.AUTH_ERROR_CODE, '用户身份验证失败,无法添加post');
     //检查categoryId 是否存在
     Category.model.model.findOne({_id : body.category}, function (err, item) {
         if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);
