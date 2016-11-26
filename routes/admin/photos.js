@@ -92,9 +92,11 @@ function qiniuToken(req, res) {
     bucket = 'fang-space';
 
     //构建上传策略函数，设置回调的url以及需要回调给业务服务器的数据
-    function uptoken(bucket, key) {
+    function uptoken(bucket) {
         //var putPolicy = new qiniu.rs.PutPolicy(bucket+":"+key);
         var putPolicy = new qiniu.rs.PutPolicy(bucket);
+        putPolicy.returnBody = '{"key":$(key), "hash":$(etag)}';
+        putPolicy.mimeLimit = 'image/*';    //限制只能上传图片
         //putPolicy.callbackUrl = 'http://your.domain.com/callback';
         //putPolicy.callbackBody = 'filename=$(fname)&filesize=$(fsize)';
         return putPolicy.token();
@@ -102,8 +104,16 @@ function qiniuToken(req, res) {
 
 //生成上传 Token
     token = uptoken(bucket);
-
-    res.rightJson({token : token});
-
+    //res.rightJson({token : token});
+    res.header("Cache-Control", "max-age=0, private, must-revalidate");
+    res.header("Pragma", "no-cache");
+    res.header("Expires", 0);
+    res.header("Access-Control-Allow-Origin","*");
+    if (token) {
+        res.json({
+            uptoken: token,
+            domain: domain
+        });
+    }
 }
 

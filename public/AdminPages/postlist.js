@@ -26,12 +26,20 @@ value('fields', {
 
 }).
 controller('postlistCtrl', function ($scope, $http, $location, fields){
+
+
     $scope.fields = fields; //要显示的字段
 
-    $scope.page = 0;    //当前页
-    $scope.size = 0;    //每页显示数量
+    $scope.page = $location.search().page ? $location.search().page : 0;    //当前页
+    $scope.size = $location.search().size ? $location.search().size : 10;    //每页显示数量
+
     $scope.posts = [];  //显示的post数据
-    $scope.categorys = $scope.rt_categorys;  //所有类目,用来做categoryId与categoryName的映射
+
+    $scope.getCategorys(function (items) {
+        if (items) {
+            $scope.categorys = $scope.rt_categorys;  //所有类目,用来做categoryId与categoryName的映射
+        }
+    });
     $scope.itemCount = 0;   //总条目数
     $scope.pageCount = 0;   //总页数
     $scope.pages = [];
@@ -44,7 +52,7 @@ controller('postlistCtrl', function ($scope, $http, $location, fields){
     };
 
     //初始化 参数为每页显示条数, 当前页编号
-    intiWithSize(1, 0);
+    intiWithSize($scope.size, $scope.page);
 
     function setPage(page) {
         $scope.page = page;

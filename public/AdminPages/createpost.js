@@ -2,7 +2,7 @@
  * Created by fangwenyu on 2016/11/23.
  */
 
-angular.module('myApp.createPost',['ngRoute'])
+angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
     .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
         $routeProvider
             .when('/post', {
@@ -14,7 +14,77 @@ angular.module('myApp.createPost',['ngRoute'])
                 controller : 'editPostCtrl'
             })
     }])
-    .controller('createPostCtrl', function ($scope, $http) {
+    .controller('createPostCtrl', function ($scope, $http, FileUploader) {
+
+        //===========================>
+        //var token = '4XJ-j01TBq87-xR6B3r-IvXg0ufjZMtVlK9huB99:UL4TNiwUQJve4KEubqmDd53T7oE=:eyJtaW1lTGltaXQiOiJpbWFnZS8qIiwicmV0dXJuQm9keSI6IntrZXk6JChrZXkpLCBoYXNoOiQoZXRhZyksIHc6JChpbWFnZUluZm8ud2lkdGgpLCBoOiQoaW1hZ2VJbmZvLmhlaWdodCl9Iiwic2NvcGUiOiJmYW5nLXNwYWNlIiwiZGVhZGxpbmUiOjE0ODAxNTc3MDh9';
+        //angular-file-upload
+
+        $scope.pics = [];
+
+        var uploader = $scope.uploader = new FileUploader({
+            url : 'http://upload.qiniu.com',
+            queueLimit: 1     //文件个数
+        });
+
+        $http.get('/admin/photos/qnToken').success(function (data) {
+            $scope.token = data.uptoken;   //获取你的七牛uptoken
+            $scope.prefix = data.domain;	//获取你的七牛文件存储地址
+            uploader.formData.push({
+                //"token" : $scope.uptoken
+                "token" : $scope.token
+            });
+        });
+
+        // FILTERS
+        uploader.filters.push({
+            name: 'customFilter',
+            fn: function(item /*{File|FileLikeObject}*/, options) {
+                return this.queue.length < 10;
+            }
+        });
+
+        // CALLBACKS
+
+        uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
+            console.info('onWhenAddingFileFailed', item, filter, options);
+        };
+        uploader.onAfterAddingFile = function(fileItem) {
+            //console.info('onAfterAddingFile', fileItem);
+        };
+        uploader.onAfterAddingAll = function(addedFileItems) {
+            //console.info('onAfterAddingAll', addedFileItems);
+        };
+        uploader.onBeforeUploadItem = function(item) {
+            //console.info('onBeforeUploadItem', item);
+        };
+        uploader.onProgressItem = function(fileItem, progress) {
+            //console.info('onProgressItem', fileItem, progress);
+        };
+        uploader.onProgressAll = function(progress) {
+            //console.info('onProgressAll', progress);
+        };
+        uploader.onSuccessItem = function(fileItem, response, status, headers) {
+            console.info('onSuccessItem', fileItem, response, status, headers);
+            $scope.pics.push({url : $scope.prefix + '/' + response.key});
+            uploader.removeFromQueue(fileItem); //从列队里删除,否则再添加文件就会失败 因为限制了queueLimit=1
+        };
+        uploader.onErrorItem = function(fileItem, response, status, headers) {
+            console.info('onErrorItem', fileItem, response, status, headers);
+        };
+        uploader.onCancelItem = function(fileItem, response, status, headers) {
+            //console.info('onCancelItem', fileItem, response, status, headers);
+        };
+        uploader.onCompleteItem = function(fileItem, response, status, headers) {
+            //console.info('onCompleteItem', fileItem, response, status, headers);
+        };
+        uploader.onCompleteAll = function() {
+            //console.info('onCompleteAll');
+        };
+
+        console.info('uploader', uploader);
+
+        //===================>
 
         $scope.post = {};
 
@@ -25,15 +95,21 @@ angular.module('myApp.createPost',['ngRoute'])
         $scope.post.publish = false;
         $scope.post.recommend = false;
 
-        $scope.categorys = [];
-        $scope.rt_categorys.map(function (x) {
-            if (x.root == 1) {
-                $scope.categorys.push(x);
+
+        $scope.getCategorys(function (items) {
+            if (items) {
+                $scope.categorys = items.filter(function (x) {
+                    return x.root == 1;
+                });
+                $scope.selectedCategory = $scope.categorys[0];
             }
         });
 
-        $scope.selectedCategory = $scope.categorys[0];
-        $scope.post.author = $scope.rt_userInfo.Nick;
+        $scope.getUserInfo(function (user) {
+            if (user) {
+                $scope.post.author = user.Nick;
+            }
+        });
 
         $scope.submit = function () {
             
@@ -53,13 +129,18 @@ angular.module('myApp.createPost',['ngRoute'])
                 }
 
             );
-        }
+        };
+
+
     })
     .controller('editPostCtrl', function ($scope, $location,  $http) {
-
-        // $scope.id;
-        // $scope.post;
-        // $scope.selectedCategory;
+        $scope.getCategorys(function (items) {
+            if (items) {
+                $scope.categorys = items.filter(function (x) {
+                    return x.root == 1;
+                });
+            }
+        });
 
         if ($location.search().id) {
             $scope.id = $location.search().id;  //post id
@@ -86,7 +167,6 @@ angular.module('myApp.createPost',['ngRoute'])
                     }
                     else alert(response.description);
                 }
-
             );
         };
 
@@ -113,3 +193,4 @@ angular.module('myApp.createPost',['ngRoute'])
             }
         }
     });
+

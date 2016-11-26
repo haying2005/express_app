@@ -2,6 +2,10 @@
     <div class="panel-heading">
         文章列表
     </div>
+    <div>
+        <button class="btn btn-default"><a href="#!/post">写文章</a></button>
+        <!--<button type="button" class="btn btn-default"><a href="#!/post">写文章</a></button>-->
+    </div>
     <!-- /.panel-heading -->
     <div class="panel-body">
         <table  width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
@@ -27,10 +31,10 @@
 
         <nav>
             <ul class="pagination">
-                <li ng-click="toPage(page - 1)" ng-class="{disabled : page == 0}"><a href="">&laquo;</a></li>
+                <li ng-class="{disabled : page == 0}"><a href="">&laquo;</a></li>
                 <!--<li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>-->
-                <li ng-class="{active : page == $index}" ng-repeat="x in pages" ng-click="toPage($index)"><a href="">{{$index + 1}}</a></li>
-                <li ng-click="toPage(page + 1)" ng-class="{disabled : page == pageCount - 1}"><a href="">&raquo;</a></li>
+                <li ng-class="{active : page == $index}" ng-repeat="x in pages"><a href="#!/postlist?page={{$index}}&&size=">{{$index + 1}}</a></li>
+                <li ng-class="{disabled : page == pageCount - 1}"><a href="">&raquo;</a></li>
             </ul>
         </nav>
     </div>
