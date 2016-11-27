@@ -2,7 +2,7 @@
  * Created by fangwenyu on 2016/11/21.
  */
 
-var path = require('path');
+//var path = require('path');
 var express = require('express');
 var router = express.Router();
 var Photo = require('../../models/Photo');
@@ -18,64 +18,15 @@ var multer  = require('multer');
 var upload = multer({ dest: 'public/uploads' });
 var mime = require('mime');
 
-router.post('/upload', upload.single('photo'), function (req, res, next) {
-    //console.log(req.file);
-    //res.rightJson(req.file);
-    file = req.file;
-    var domain = 'http://ogomt2558.bkt.clouddn.com';
-
-    //要上传的空间
-    bucket = 'fang-space';
-    //上传到七牛后保存的文件名
-    //key = file.filename;
-
-    //构建上传策略函数，设置回调的url以及需要回调给业务服务器的数据
-    function uptoken(bucket, key) {
-        //var putPolicy = new qiniu.rs.PutPolicy(bucket+":"+key);
-        var putPolicy = new qiniu.rs.PutPolicy(bucket);
-        //putPolicy.callbackUrl = 'http://your.domain.com/callback';
-        //putPolicy.callbackBody = 'filename=$(fname)&filesize=$(fsize)';
-        return putPolicy.token();
-    }
-
-//生成上传 Token
-    token = uptoken(bucket, key);
-
-//要上传文件的本地路径
-    filePath = file.path;
-
-//构造上传函数
-    function uploadFile(uptoken, key, localFile) {
-        var extra = new qiniu.io.PutExtra();
-        qiniu.io.putFile(uptoken, key, localFile, extra, function(err, ret) {
-            if(!err) {
-                // 上传成功， 处理返回值
-                fullpath = path.join(domain, ret.key);
-                res.rightJson({path : fullpath});
-
-            } else {
-                // 上传失败， 处理返回代码
-                console.log(err);
-                res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err);
-            }
-        });
-    }
-
-//调用uploadFile上传
-    uploadFile(token, key, filePath);
-});
+router.post('/upload', upload.single('photo'), uploadPhoto);
 router.post('/', createPhoto);
 
 router.get('/qnToken', qiniuToken);
 
-// router.post('/', createPost);
-// router.get('/', getPostList);
-// router.get('/:id', getPostById);
-// router.use('/', modifyById, deleteById);
 module.exports = router;
 
 /*
-    创建
+    创建一个photo
  */
 function createPhoto(req, res) {
     var body = req.body;
@@ -141,3 +92,53 @@ function qiniuToken(req, res) {
     }
 }
 
+
+/*
+接收客户端上传的文件 然后传至七牛服务器 (暂时没用, 因为从客户端直接传到七牛)
+ */
+function uploadPhoto(req, res, next) {
+    //console.log(req.file);
+    //res.rightJson(req.file);
+    file = req.file;
+    var domain = 'http://ogomt2558.bkt.clouddn.com';
+
+    //要上传的空间
+    bucket = 'fang-space';
+    //上传到七牛后保存的文件名
+    //key = file.filename;
+
+    //构建上传策略函数，设置回调的url以及需要回调给业务服务器的数据
+    function uptoken(bucket, key) {
+        //var putPolicy = new qiniu.rs.PutPolicy(bucket+":"+key);
+        var putPolicy = new qiniu.rs.PutPolicy(bucket);
+        //putPolicy.callbackUrl = 'http://your.domain.com/callback';
+        //putPolicy.callbackBody = 'filename=$(fname)&filesize=$(fsize)';
+        return putPolicy.token();
+    }
+
+//生成上传 Token
+    token = uptoken(bucket, key);
+
+//要上传文件的本地路径
+    filePath = file.path;
+
+//构造上传函数
+    function uploadFile(uptoken, key, localFile) {
+        var extra = new qiniu.io.PutExtra();
+        qiniu.io.putFile(uptoken, key, localFile, extra, function(err, ret) {
+            if(!err) {
+                // 上传成功， 处理返回值
+                fullpath = path.join(domain, ret.key);
+                res.rightJson({path : fullpath});
+
+            } else {
+                // 上传失败， 处理返回代码
+                console.log(err);
+                res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err);
+            }
+        });
+    }
+
+//调用uploadFile上传
+    uploadFile(token, key, filePath);
+}

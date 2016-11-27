@@ -5,7 +5,7 @@ angular.module('myApp', [
 
 ]).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
     $locationProvider.hashPrefix('!');
-    $routeProvider
+    //$routeProvider
     //                    .when('/', {template: '首页'})
     //                    .when('/photo', {template: '图片库'})
     //                    .when('/product', {template: '产品'})

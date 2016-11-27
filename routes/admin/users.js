@@ -16,7 +16,7 @@ router.use(expressSsession({
     secret : 'haying2009',
     resave : false,
     saveUninitialized : false,
-    cookie : {maxAge : 60 * 60 *1000}
+    cookie : {maxAge : 6000 * 60 *1000}
 }));
 
 router.post('/login', login);

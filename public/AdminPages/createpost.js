@@ -2,7 +2,7 @@
  * Created by fangwenyu on 2016/11/23.
  */
 
-angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
+angular.module('myApp.createPost',['ngRoute', 'angularFileUpload', 'summernote'])
     .config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
         $routeProvider
             .when('/post', {
@@ -15,6 +15,40 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
             })
     }])
     .controller('createPostCtrl', function ($scope, $http, FileUploader) {
+
+        //$('#summernote').summernote();
+        // $(document).ready(function() {
+        //     $('#summernote').summernote({
+        //         height: 300,                 // set editor height
+        //         minHeight: null,             // set minimum height of editor
+        //         maxHeight: null,             // set maximum height of editor
+        //         focus: true                  // set focus to editable area after initializing summernote
+        //     });
+        // });
+
+        $scope.options = {
+            height: 300
+
+        };
+
+        $scope.init = function() { console.log('Summernote is launched'); };
+        $scope.enter = function() { console.log('Enter/Return key pressed'); };
+        $scope.focus = function(e) { console.log('Editable area is focused'); };
+        $scope.blur = function(e) { console.log('Editable area loses focus'); };
+        $scope.paste = function(e) {
+            console.log('Called event paste: ' +  e.originalEvent.clipboardData.getData('text'));
+        };
+        $scope.change = function(contents) {
+            console.log('contents are changed:', contents, $scope.editable);
+        };
+        $scope.keyup = function(e) { console.log('Key is released:', e.keyCode); };
+        $scope.keydown = function(e) { console.log('Key is pressed:', e.keyCode); };
+        $scope.imageUpload = function(files) {
+            console.log('image upload:', files);
+            console.log('image upload\'s editor:', $scope.editor);
+            console.log('image upload\'s editable:', $scope.editable);
+        };
+
 
         //===========================>
         //angular-file-upload
@@ -30,7 +64,6 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
             $scope.token = data.uptoken;   //获取你的七牛uptoken
             $scope.prefix = data.domain;	//获取你的七牛文件存储地址
             uploader.formData.push({
-                //"token" : $scope.uptoken
                 "token" : $scope.token
             });
         });
@@ -92,6 +125,7 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
 
         console.info('uploader', uploader);
 
+        //angular-file-upload end
         //===================>
 
         $scope.post = {};
@@ -99,7 +133,7 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload'])
         $scope.post.title = '';
         $scope.post.brief = '';
         $scope.post.thumbnail = '';
-        $scope.post.content = '';
+        $scope.post.content = '<h1>大发发</h1>';
         $scope.post.publish = false;
         $scope.post.recommend = false;
 
