@@ -16,16 +16,8 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload', 'summernote']
     }])
     .controller('createPostCtrl', function ($scope, $http, FileUploader) {
 
-        //$('#summernote').summernote();
-        // $(document).ready(function() {
-        //     $('#summernote').summernote({
-        //         height: 300,                 // set editor height
-        //         minHeight: null,             // set minimum height of editor
-        //         maxHeight: null,             // set maximum height of editor
-        //         focus: true                  // set focus to editable area after initializing summernote
-        //     });
-        // });
-
+        //===========================>
+        //summernote-angular begin
         $scope.options = {
             height: 300
 
@@ -48,58 +40,34 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload', 'summernote']
             console.log('image upload\'s editor:', $scope.editor);
             console.log('image upload\'s editable:', $scope.editable);
         };
-
+        //summernote-angular end
+        //===================>
 
         //===========================>
-        //angular-file-upload
+        //angular-file-upload begin
 
-        $scope.pics = [];
-
-        var uploader = $scope.uploader = new FileUploader({
-            url : 'http://upload.qiniu.com',
-            queueLimit: 1     //文件个数
-        });
-
+        //获取新的七牛token
         $http.get('/admin/photos/qnToken').success(function (data) {
             $scope.token = data.uptoken;   //获取你的七牛uptoken
             $scope.prefix = data.domain;	//获取你的七牛文件存储地址
-            uploader.formData.push({
-                "token" : $scope.token
-            });
+            $scope.uploader.formData.push({token : $scope.token});
+
         });
 
-        // FILTERS
-        uploader.filters.push({
-            name: 'customFilter',
-            fn: function(item /*{File|FileLikeObject}*/, options) {
-                return this.queue.length < 10;
-            }
-        });
+        //文章缩略图uploader
+        $scope.uploader = $scope.createUploader(100);
 
-        // CALLBACKS
+        $scope.uploader.onAfterAddingFile = function(fileItem) {
+            $scope.uploader.uploadItem(fileItem);
+        };
 
-        uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
-            console.info('onWhenAddingFileFailed', item, filter, options);
-        };
-        uploader.onAfterAddingFile = function(fileItem) {
-            //console.info('onAfterAddingFile', fileItem);
-        };
-        uploader.onAfterAddingAll = function(addedFileItems) {
-            //console.info('onAfterAddingAll', addedFileItems);
-        };
-        uploader.onBeforeUploadItem = function(item) {
-            //console.info('onBeforeUploadItem', item);
-        };
-        uploader.onProgressItem = function(fileItem, progress) {
-            //console.info('onProgressItem', fileItem, progress);
-        };
-        uploader.onProgressAll = function(progress) {
-            //console.info('onProgressAll', progress);
-        };
-        uploader.onSuccessItem = function(fileItem, response, status, headers) {
+        $scope.uploader.onSuccessItem = function(fileItem, response, status, headers) {
             console.info('onSuccessItem', fileItem, response, status, headers);
-            $scope.pics.push({url : $scope.prefix + '/' + response.key});
-            uploader.removeFromQueue(fileItem); //从列队里删除,否则再添加文件就会失败 因为限制了queueLimit=1
+            // $scope.pics.push({url : $scope.prefix + '/' + response.key});
+
+            $scope.post.thumbnail = $scope.prefix + '/' + response.key;
+            $scope.uploader.removeFromQueue(fileItem); //
+
             //将文件信息提交到服务器存档
             var photo = {};
             photo.name = response.key;
@@ -110,20 +78,6 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload', 'summernote']
                 console.log(response);
             });
         };
-        uploader.onErrorItem = function(fileItem, response, status, headers) {
-            console.info('onErrorItem', fileItem, response, status, headers);
-        };
-        uploader.onCancelItem = function(fileItem, response, status, headers) {
-            //console.info('onCancelItem', fileItem, response, status, headers);
-        };
-        uploader.onCompleteItem = function(fileItem, response, status, headers) {
-            //console.info('onCompleteItem', fileItem, response, status, headers);
-        };
-        uploader.onCompleteAll = function() {
-            //console.info('onCompleteAll');
-        };
-
-        console.info('uploader', uploader);
 
         //angular-file-upload end
         //===================>
@@ -133,7 +87,7 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload', 'summernote']
         $scope.post.title = '';
         $scope.post.brief = '';
         $scope.post.thumbnail = '';
-        $scope.post.content = '<h1>大发发</h1>';
+        $scope.post.content = '';
         $scope.post.publish = false;
         $scope.post.recommend = false;
 
@@ -176,6 +130,74 @@ angular.module('myApp.createPost',['ngRoute', 'angularFileUpload', 'summernote']
 
     })
     .controller('editPostCtrl', function ($scope, $location,  $http) {
+
+        //===========================>
+        //summernote-angular begin
+        $scope.options = {
+            height: 300
+
+        };
+
+        $scope.init = function() { console.log('Summernote is launched'); };
+        $scope.enter = function() { console.log('Enter/Return key pressed'); };
+        $scope.focus = function(e) { console.log('Editable area is focused'); };
+        $scope.blur = function(e) { console.log('Editable area loses focus'); };
+        $scope.paste = function(e) {
+            console.log('Called event paste: ' +  e.originalEvent.clipboardData.getData('text'));
+        };
+        $scope.change = function(contents) {
+            console.log('contents are changed:', contents, $scope.editable);
+        };
+        $scope.keyup = function(e) { console.log('Key is released:', e.keyCode); };
+        $scope.keydown = function(e) { console.log('Key is pressed:', e.keyCode); };
+        $scope.imageUpload = function(files) {
+            console.log('image upload:', files);
+            console.log('image upload\'s editor:', $scope.editor);
+            console.log('image upload\'s editable:', $scope.editable);
+        };
+        //summernote-angular end
+        //===================>
+
+        //===========================>
+        //angular-file-upload begin
+
+        //获取新的七牛token
+        $http.get('/admin/photos/qnToken').success(function (data) {
+            $scope.token = data.uptoken;   //获取你的七牛uptoken
+            $scope.prefix = data.domain;	//获取你的七牛文件存储地址
+            $scope.uploader.formData.push({token : $scope.token});
+
+        });
+
+        //文章缩略图uploader
+        $scope.uploader = $scope.createUploader(100);
+
+        $scope.uploader.onAfterAddingFile = function(fileItem) {
+            $scope.uploader.uploadItem(fileItem);
+        };
+
+        $scope.uploader.onSuccessItem = function(fileItem, response, status, headers) {
+            console.info('onSuccessItem', fileItem, response, status, headers);
+            // $scope.pics.push({url : $scope.prefix + '/' + response.key});
+
+            $scope.post.thumbnail = $scope.prefix + '/' + response.key;
+            $scope.uploader.removeFromQueue(fileItem); //从列队里删除
+
+            //将文件信息提交到服务器存档
+            var photo = {};
+            photo.name = response.key;
+            photo.hash = response.hash;
+            photo.path = $scope.prefix + '/' + response.key;
+            photo.album = '文章相册';
+            $http.post('/admin/photos', photo).success(function (response) {
+                console.log(response);
+            });
+        };
+
+
+        //angular-file-upload end
+        //===================>
+
         $scope.getCategorys(function (items) {
             if (items) {
                 $scope.categorys = items.filter(function (x) {

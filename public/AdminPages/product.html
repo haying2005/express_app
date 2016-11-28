@@ -1,0 +1,65 @@
+<form role="form" novalidate>
+    <fieldset>
+
+        <div class="form-group">
+            <label>产品名称</label>
+            <input ng-model="product.title" class="form-control" placeholder="产品名称">
+            <!--<p class="help-block">请输入标题</p>-->
+        </div>
+
+        <div class="form-group">
+            <label>产品图片</label>
+            <div ng-show="product.pics.length">
+                <label ng-repeat="x in product.pics">
+                    <img class="img-thumbnail" width="100" ng-src="{{x}}"/>
+                </label>
+                <!--<span ng-if="item.imgSrc" ng-click="img_del($index)"></span>-->
+            </div>
+            <!--<input>-->
+            <input type="file" nv-file-select="" uploader="uploader1">
+        </div>
+
+        <div class="form-group">
+            <label>选择分类</label>
+            <select class="form-control" ng-model="selectedCategory" ng-options="x.name for x in categorys">
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>摘要</label>
+            <textarea ng-model="product.brief" class="form-control" rows="3" placeholder="不要超过100字"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>缩略图</label>
+            <div>
+                <label>
+                    <img ng-show="product.thumbnail" class="img-thumbnail" width="100" ng-src="{{product.thumbnail}}"/>
+                </label>
+                <!--<span ng-if="item.imgSrc" ng-click="img_del($index)"></span>-->
+            </div>
+            <!--<input>-->
+            <input type="file" nv-file-select="" uploader="uploader">
+            <!--<button class="btn btn-default" ng-click="uploader.uploadAll()">上传</button>-->
+        </div>
+
+        <div class="form-group">
+            <label>正文</label>
+            <!--summernote编辑器-->
+            <summernote ng-model="product.content" config="options" on-image-upload="imageUpload(files)"></summernote>
+        </div>
+
+        <div class="form-group">
+            <label class="checkbox-inline">
+                <input ng-model="product.publish" type="checkbox">发布
+            </label>
+
+            <label class="checkbox-inline">
+                <input ng-model="product.recommend" type="checkbox">置顶
+            </label>
+
+        </div>
+        <button ng-click="submit()" class="btn btn-primary">提交</button>
+        <!--<button type="submit" class="btn btn-default">重置</button>-->
+    </fieldset>
+</form>

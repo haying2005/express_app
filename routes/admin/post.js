@@ -100,7 +100,7 @@ function getPostById(req, res, next) {
 
 /**
  * 修改文章 创建者 点击次数  不能手动更新
- * todo:title brief等 需要做为空判断,不允许其为空 不能用!来判断,因为有可能没有传值
+ *
  */
 function modifyById(req, res, next) {
     if (req.method.toLowerCase() === 'put'){
@@ -108,17 +108,33 @@ function modifyById(req, res, next) {
         var body = req.body;
 
         if (!body._id) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, '_id不能为空');
-        var update = {};
-        if (body.category !== undefined) update.category = body.category;
-        if (body.title !== undefined) update.title = body.title;
-        if (body.author !== undefined) update.author = body.author;
-        if (body.brief !== undefined) update.brief = body.brief;
-        if (body.thumbnail !== undefined) update.thumbnail = body.thumbnail;
-        if (body.content !== undefined) update.content = body.content;
-        if (body.publish !== undefined) update.publish = body.publish;
-        if (body.recommend !== undefined) update.recommend = body.recommend;
-        if (body.category !== undefined) update.category = body.category;
 
+        if (!body.category || body.category.length === 0) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, 'category不能为空');
+        if (!body.title || body.title.length === 0) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, 'title不能为空');
+        if (!body.brief || body.brief.length === 0) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, 'brief不能为空');
+        if (!body.content || body.content.length === 0) return res.errorJson(result.ILLEGAL_ARGUMENT_ERROR_CODE, 'content不能为空');
+        if (!req.session.userId) return res.errorJson(result.AUTH_ERROR_CODE, '用户身份验证失败,无法修改post');
+
+        var update = {
+            title : body.title,
+            by : req.session.userId,
+            brief : body.brief,
+            thumbnail : body.thumbnail,
+            author : body.author,
+            content : body.content,
+            publish : body.publish,
+            recommend : body.recommend,
+            category : body.category
+        };
+        // if (body.category !== undefined) update.category = body.category;
+        // if (body.title !== undefined) update.title = body.title;
+        // if (body.author !== undefined) update.author = body.author;
+        // if (body.brief !== undefined) update.brief = body.brief;
+        // if (body.thumbnail !== undefined) update.thumbnail = body.thumbnail;
+        // if (body.content !== undefined) update.content = body.content;
+        // if (body.publish !== undefined) update.publish = body.publish;
+        // if (body.recommend !== undefined) update.recommend = body.recommend;
+        // if (body.category !== undefined) update.category = body.category;
 
         Post.model.model.findByIdAndUpdate({_id : body._id}, update, function (err, item) {
             if (err) return res.errorJson(result.SERVER_EXCEPTION_ERROR_CODE, err.message);

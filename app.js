@@ -14,6 +14,7 @@ var adminUsers = require('./routes/admin/users');
 var adminCategory = require('./routes/admin/category');
 var adminPost = require('./routes/admin/post');
 var adminPhoto = require('./routes/admin/photos');
+var adminProduct = require('./routes/admin/products');
 
 var app = express();
 
@@ -34,6 +35,7 @@ var result = require('./routes/return-result.js');
 app.use(result.resultMiddle);
 
 var expressSsession = require('express-session');
+//使用session
 app.use(expressSsession({
   secret : 'haying2009',
   resave : false,
@@ -64,6 +66,7 @@ app.use('/admin/users', adminUsers);
 app.use('/admin/categorys', adminCategory);
 app.use('/admin/posts', adminPost);
 app.use('/admin/photos', adminPhoto);
+app.use('/admin/products', adminProduct);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -97,15 +100,7 @@ function errorHandler (err, req, res, next) {
 
 //身份验证
 function loginValidate (req, res, next) {
-  // req.session.userId;
-  // req.session.userNick;
-  // req.session.right;
   if (req.session.userId){
-    //req.isLogin = true;
-    // req.userInfo = {
-    //   uid : req.session.userId,
-    //   nick : req.session.userNick
-    // };
     next();
   }
   else {
@@ -113,6 +108,7 @@ function loginValidate (req, res, next) {
     console.log(req.url);
     var reg = new RegExp('^/admin/');
     if (reg.test(req.url)) {
+      //只要是带admin前缀的路由 除了登录注册接口可以放开 其他一律拦截
       if (req.url === '/admin/users/login' || req.url ==='/admin/users/signup') next();
       else return res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
     }
