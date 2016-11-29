@@ -3,6 +3,7 @@ angular.module('myApp', [
     'myApp.createPost',
     'myApp.postlist',
     'myApp.product',
+    'myApp.productlist',
     'angularFileUpload'
 
 ]).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {

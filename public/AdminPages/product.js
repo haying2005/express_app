@@ -16,7 +16,10 @@ angular.module('myApp.product', ['ngRoute', 'angularFileUpload', 'summernote']).
 
 }]).
     controller('productCtrl', function ($scope, $http, FileUploader, $location) {
-        $scope.url = $location.url();
+        $scope.path = $location.path();
+    var isEdit = ($scope.path == '/editproduct');
+    var id = $location.search().id;
+
 
     $scope.getCategorys(function (items) {
         if (items) {
@@ -29,6 +32,27 @@ angular.module('myApp.product', ['ngRoute', 'angularFileUpload', 'summernote']).
 
     $scope.product = {};
     $scope.product.pics = [];
+
+    if (isEdit) {
+        function getSelectedCategory(_id) {
+            for (var i = 0; i < $scope.categorys.length; i ++) {
+                if (_id == $scope.categorys[i]._id) {
+                    return $scope.categorys[i];
+                }
+            }
+        }
+        console.log('get product');
+        $http.get('/admin/products/' + id).success(function (response) {
+            if (response.code == 0) {
+                $scope.product = response.data;
+                $scope.selectedCategory = getSelectedCategory($scope.product.category);
+
+            }
+            else {
+                alert(response.description);
+            }
+        })
+    }
 
     //===========================>
     //angular-file-upload begin
@@ -131,6 +155,7 @@ angular.module('myApp.product', ['ngRoute', 'angularFileUpload', 'summernote']).
     //===================>
 
     $scope.submit = function () {
+
         $scope.product.category = $scope.selectedCategory._id;
 
         if (!$scope.product.title) return alert('请填写标题');
@@ -138,16 +163,31 @@ angular.module('myApp.product', ['ngRoute', 'angularFileUpload', 'summernote']).
         if (!$scope.product.brief) return alert('请填写摘要');
         if (!$scope.product.content) return alert('请填写正文');
         //if (!$scope.product.pics.length) return alert('请上传产品图片');
-        console.log($scope.post);
+        console.log($scope.product);
 
-        $http.post('/admin/products', $scope.product).success(function (response) {
-                if (response.code === 0) {
-                    alert('发布成功');
+
+        if (isEdit) {
+            $http.put('/admin/products', $scope.product).success(function (response) {
+                if (response.code == 0) {
+                    alert('修改成功!');
                 }
-                else alert(response.description);
-            }
+                else {
+                    alert(response.description);
+                }
+            });
+        }
+        else {
 
-        );
+            $http.post('/admin/products', $scope.product).success(function (response) {
+                    if (response.code === 0) {
+                        alert('发布成功');
+                    }
+                    else alert(response.description);
+                }
+
+            );
+        }
+
     }
 
 });
