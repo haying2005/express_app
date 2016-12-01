@@ -66,10 +66,11 @@ angular.module('myApp.product', ['ngRoute', 'angularFileUpload', 'summernote']).
         $scope.prefix = data.domain;	//获取你的七牛文件存储地址
         $scope.uploader.formData.push({token : $scope.token});//token要在upload方法执行前加入到formData 否则无效
         $scope.uploader1.formData.push({token : $scope.token});//token要在upload方法执行前加入到formData 否则无效
+        $scope.uploader2.formData.push({token : $scope.token});//token要在upload方法执行前加入到formData 否则无效
 
     });
 
-    //文章缩略图uploader
+    //缩略图uploader
     $scope.uploader = $scope.createUploader(100);
 
     $scope.uploader.onAfterAddingFile = function(fileItem) {
@@ -112,7 +113,30 @@ angular.module('myApp.product', ['ngRoute', 'angularFileUpload', 'summernote']).
             }
         }
         $scope.product.pics.push($scope.prefix + '/' + response.key);
-        $scope.uploader1.removeFromQueue(fileItem); //从列队里删除,否则再添加文件就会失败 因为限制了queueLimit=1
+        $scope.uploader1.removeFromQueue(fileItem); //从列队里删除
+
+        //将文件信息提交到服务器存档
+        var photo = {};
+        photo.name = response.key;
+        photo.hash = response.hash;
+        photo.path = $scope.prefix + '/' + response.key;
+        photo.album = '产品相册';
+        $http.post('/admin/photos', photo).success(function (response) {
+            console.log(response.description);
+        });
+    };
+
+    //富文本编辑器uploader
+    $scope.uploader2 = $scope.createUploader(100);
+    $scope.uploader2.onAfterAddingFile = function(fileItem) {
+        $scope.uploader2.uploadItem(fileItem);
+    };
+    $scope.uploader2.onSuccessItem = function(fileItem, response, status, headers) {
+        console.info('onSuccessItem', fileItem, response, status, headers);
+        // $scope.pics.push({url : $scope.prefix + '/' + response.key});
+        var url = $scope.prefix + '/' + response.key;
+        $("#summernote").summernote('insertImage', url, 'image name'); // the insertImage API
+        $scope.uploader2.removeFromQueue(fileItem); //从列队里删除
 
         //将文件信息提交到服务器存档
         var photo = {};
@@ -147,9 +171,11 @@ angular.module('myApp.product', ['ngRoute', 'angularFileUpload', 'summernote']).
     $scope.keyup = function(e) { console.log('Key is released:', e.keyCode); };
     $scope.keydown = function(e) { console.log('Key is pressed:', e.keyCode); };
     $scope.imageUpload = function(files) {
-        console.log('image upload:', files);
-        console.log('image upload\'s editor:', $scope.editor);
-        console.log('image upload\'s editable:', $scope.editable);
+        // console.log('image upload:', files);
+        // console.log('image upload\'s editor:', $scope.editor);
+        // console.log('image upload\'s editable:', $scope.editable);
+        $scope.uploader2.addToQueue(files);
+
     };
     //summernote-angular end
     //===================>
