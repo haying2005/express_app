@@ -116,12 +116,15 @@ function loginValidate (req, res, next) {
   }
   else {
     req.isLogin = false;
-    console.log(req.url);
+    //console.log(req.url);
     var reg = new RegExp('^/admin/');
     if (reg.test(req.url)) {
       //只要是带admin前缀的路由 除了登录注册接口可以放开 其他一律拦截
       if (req.url === '/admin/users/login' || req.url ==='/admin/users/signup' || req.url ==='/admin/login') next();
-      else return res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
+      else {
+        res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
+        res.redirect('/admin/users/login');
+      }
     }
     else next();
   }

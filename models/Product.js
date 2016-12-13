@@ -17,8 +17,8 @@ var productSchemea = new mongoose.Schema({
     publish : {type : Boolean, default : 0},   //是否发布
     recommend : {type : Boolean, default : 0},   //是否推荐
     click : {type : Number, default : 0},   //点击次数
-    inquire : {type : Number, default : 0}  //询价次数
-
+    inquire : {type : Number, default : 0},  //询价次数
+    priority : {type : Number, default : 0} //优先级
 },{
     versionKey: false,
     timestamps: true
