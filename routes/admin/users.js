@@ -109,5 +109,6 @@ function getUserInfo(req, res) {
  * 输出登陆页面
  */
 function toLoginPage(req, res) {
-    res.render('login');
+    //res.render('login');
+    res.redirect('/AdminPages/login.html');
 }

@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var nunjucks = require('nunjucks');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -20,7 +21,16 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'nunjucks');
+nunjucks.configure('views', {
+      autoescape: true,
+      express: app,
+      noCache: true
+    }
+);
+app.get('/', function (req, res, next) {
+  res.render('new_index.html');
+});
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -28,6 +38,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+//设置静态文件目录
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -109,7 +120,7 @@ function loginValidate (req, res, next) {
     var reg = new RegExp('^/admin/');
     if (reg.test(req.url)) {
       //只要是带admin前缀的路由 除了登录注册接口可以放开 其他一律拦截
-      if (req.url === '/admin/users/login' || req.url ==='/admin/users/signup') next();
+      if (req.url === '/admin/users/login' || req.url ==='/admin/users/signup' || req.url ==='/admin/login') next();
       else return res.errorJson(result.AUTH_ERROR_CODE, '身份验证失败');
     }
     else next();

@@ -2,11 +2,27 @@
  * 连接数据库
  */
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+
+if (process.env.SERVER_SOFTWARE == 'bae/3.0') {
+    mongoose.connect('mongodb://c4b53a10ae0043ac968a1322df8b7690:2d5c71f116c649b8bb7d9c9e1e9dee7e@mongo.duapp.com:8908/QIWctoARAQUxwSiMtReb');
+}
+else {
+    mongoose.connect('mongodb://localhost/test');
+}
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongoose connection error:'));
 db.once('open', function () {
     console.log('mongoose connect success!');
+});
+//防止百度云数据库无法长连接
+db.on('disconnected', function () {
+    if (process.env.SERVER_SOFTWARE == 'bae/3.0') {
+        mongoose.connect('mongodb://c4b53a10ae0043ac968a1322df8b7690:2d5c71f116c649b8bb7d9c9e1e9dee7e@mongo.duapp.com:8908/QIWctoARAQUxwSiMtReb');
+    }
+    else {
+        mongoose.connect('mongodb://localhost/test');
+    }
 });
 
 var userScheme = new mongoose.Schema({
