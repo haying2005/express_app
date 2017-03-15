@@ -51,7 +51,7 @@ app.use(expressSsession({
   secret : 'haying2009',
   resave : false,
   saveUninitialized : false,
-  cookie : {maxAge : 60 * 60 *1000}
+  cookie : {maxAge : 60 * 60 * 1000}
 }));
 
 //获取访问IP
@@ -66,7 +66,7 @@ app.use(function (req, res, next) {
 });
 
 //身份验证
-app.use(loginValidate);
+//app.use(loginValidate);
 
 
 app.use('/', index);
@@ -105,7 +105,7 @@ function clientErrorHandler (err, req, res, next) {
 
 function errorHandler (err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', { error: err })
+  res.render('error', { error: err });
 }
 
 

@@ -4,6 +4,7 @@ angular.module('myApp', [
     'myApp.postlist',
     'myApp.product',
     'myApp.productlist',
+    'myApp.category',
     'angularFileUpload'
 
 ]).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
@@ -32,6 +33,21 @@ angular.module('myApp', [
                 }
             });
         }
+    };
+
+    //从服务器重新获取cetegorys
+    $scope.reloadCategorys = function (callback) {
+        console.log('reload categorys....');
+        $http.get('/admin/categorys').success(function (response) {
+            if (response.code == 0) {
+                $scope.rt_categorys = response.data;
+                callback($scope.rt_categorys);
+            }
+            else {
+                callback(null);
+                console.log(response.description);
+            }
+        });
     };
 
 

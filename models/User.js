@@ -4,9 +4,11 @@
 var mongoose = require('mongoose');
 
 if (process.env.SERVER_SOFTWARE == 'bae/3.0') {
+    console.log('百度云数据库...');
     mongoose.connect('mongodb://c4b53a10ae0043ac968a1322df8b7690:2d5c71f116c649b8bb7d9c9e1e9dee7e@mongo.duapp.com:8908/QIWctoARAQUxwSiMtReb');
 }
 else {
+    console.log('本地数据库...');
     mongoose.connect('mongodb://localhost/test');
 }
 

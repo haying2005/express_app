@@ -1,0 +1,57 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        类目管理
+    </div>
+    <div>
+        <!--<button class="btn btn-default"><a href="#!/post">写文章</a></button>-->
+        <!--<button type="button" class="btn btn-default"><a href="#!/post">写文章</a></button>-->
+    </div>
+    <!-- /.panel-heading -->
+    <div class="panel-body">
+        <h4>所有类目</h4>
+        <ul class="nav">
+            <li class="list-group-item" ng-repeat="x in roots">
+                <div style="margin-bottom: 10px">
+                    <button type="button" class="btn btn-default btn-xs">
+                        <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                    </button>
+                    {{x.name}}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-xs btn-default  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            操作 <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="">新增子分类</a></li>
+                        </ul>
+                    </div>
+                    <div style="float: right"><span class="badge">{{x.childs.length}}</span></div>
+                </div>
+
+                <ul class="">
+                    <li class="list-group-item" ng-repeat="cate in x.childs">
+                        <button type="button" class="btn btn-default btn-xs">
+                            <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                        </button>
+                        {{cate.name}} <span style="font-size: 10px; color: dimgray">{{cate.lang.CN_String}}</span>
+                        <!--<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>-->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-xs btn-default  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                操作 <span class="caret"></span>
+                            </button>
+
+                            <ul class="dropdown-menu">
+                                <li><a href="">新增子分类</a></li>
+                                <li><a href="">编辑</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="">删除</a></li>
+                            </ul>
+                        </div>
+                        <div style="float: right"><span class="badge">{{cate.childs.length}}</span></div>
+                    </li>
+
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <!-- /.panel-body -->
+</div>
